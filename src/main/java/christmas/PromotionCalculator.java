@@ -4,6 +4,7 @@ import Menu.TotalMenu;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import view.OutputView;
 
 public class PromotionCalculator {
 
@@ -13,6 +14,12 @@ public class PromotionCalculator {
     public static final int START_DAY_OF_DDAY_PROMOTION = 1;
     public static final int DAYS_OF_WEEK = 7;
     public static final int WEEKEND_REMAIN_VALUE = 2;
+    public static final int WEEK_DAY_PROMOTION_UNIT = 2023;
+    public static final int INIT_PRICE = 0;
+    public static final int SPECIAL_DATE_PROMOTION_UNIT = 1000;
+    public static final int CHRISTMAS_DATE = 25;
+    public static final int REAMAIN_NUMBER_OF_SUNDAY = 3;
+    public static final int FREE_PRODUCT_PRICE = 25000;
     Customer customer;
     TotalMenu totalMenu;
 
@@ -21,13 +28,13 @@ public class PromotionCalculator {
         this.totalMenu = totalMenu;
     }
 
-    public Map<String, Integer> getOrderMenu(){
+    public Map<String, Integer> getOrderMenu() {
         return customer.getOrderMenu();
     }
 
-    public int calcTotalPriceBeforeDiscount(){
-        int totalPriceBeforeDiscount = 0;
-        for(String name : getOrderMenu().keySet()){
+    public int calcTotalPriceBeforeDiscount() {
+        int totalPriceBeforeDiscount = INIT_PRICE;
+        for (String name : getOrderMenu().keySet()) {
             int price = totalMenu.getMenuPrice(name);
             int menuCount = getOrderMenu().get(name);
             totalPriceBeforeDiscount += price * menuCount;
@@ -35,41 +42,59 @@ public class PromotionCalculator {
         return totalPriceBeforeDiscount;
     }
 
-    public List<Integer> calcPromotion(int date){
+    public List<Integer> calcPromotion(int date) {
         List<Integer> promotionPrices = new LinkedList<>();
         //크리스마스 디데이 할인
         promotionPrices.add(calcDDayPromotion(date));
-        //평일할인
-        promotionPrices.add(calcWeekDayPromotion(date));
+        //평일 & 주말 할인
+        List<Integer> weekDayPromotion = calcWeekDayPromotion(date);
+        promotionPrices.add(weekDayPromotion.get(0));
+        promotionPrices.add(weekDayPromotion.get(1));
         //특별할인
-        
+        promotionPrices.add(calcSpecialPromotion(date));
         //증정 이벤트
-
+        promotionPrices.add(calcFreePromotion());
         return promotionPrices;
     }
 
-    private int calcDDayPromotion(int date){
-        if(date>= START_DAY_OF_DDAY_PROMOTION && date <= END_DAY_OF_DDAY_PROMOTION){
+    private int calcDDayPromotion(int date) {
+        if (date >= START_DAY_OF_DDAY_PROMOTION && date <= END_DAY_OF_DDAY_PROMOTION) {
             return INIT_DDAY_PROMOTION_PRICE + DDAY_PROMOTION_PRICE_UNIT * (date - 1);
         }
         return 0;
     }
 
-    private int calcWeekDayPromotion(int date){
-        if(!isWeekDay(date)){
-            return getNumbersOfSpecificType("Menu.DessertMenu") * 2023;
+    private List<Integer> calcWeekDayPromotion(int date) {
+        if (!isWeekDay(date)) {
+            return List.of(getNumbersOfSpecificType("Menu.DessertMenu") * WEEK_DAY_PROMOTION_UNIT, INIT_PRICE);
         }
-        return 0;
+        return List.of(INIT_PRICE, getNumbersOfSpecificType("Menu.MainMenu") * WEEK_DAY_PROMOTION_UNIT);
     }
 
-    private boolean isWeekDay(int date){
-        if(date % DAYS_OF_WEEK <= WEEKEND_REMAIN_VALUE){
-            return true;
-        }
-        return false;
+    public boolean isWeekDay(int date) {
+        return (date % DAYS_OF_WEEK) <= WEEKEND_REMAIN_VALUE;
     }
 
-    private int getNumbersOfSpecificType(String type){
+    private int getNumbersOfSpecificType(String type) {
         return customer.getNumberOfSpecificType(totalMenu, type);
+    }
+
+    private int calcSpecialPromotion(int date) {
+        if(isSpecialDay(date)){
+            return SPECIAL_DATE_PROMOTION_UNIT;
+        }
+        return INIT_PRICE;
+    }
+
+    private boolean isSpecialDay(int date){
+        return date % DAYS_OF_WEEK == REAMAIN_NUMBER_OF_SUNDAY || date == CHRISTMAS_DATE;
+    }
+
+    private Integer calcFreePromotion() {
+        int totalPriceBeforeDiscount = calcTotalPriceBeforeDiscount();
+        if(totalPriceBeforeDiscount > OutputView.FREE_PRODUCT_THRESHOLD){
+            return FREE_PRODUCT_PRICE;
+        }
+        return INIT_PRICE;
     }
 }

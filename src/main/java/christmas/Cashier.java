@@ -62,10 +62,13 @@ public class Cashier {
     private void startPrintReceipt(int date) {
         PromotionCalculator promotionCalculator = new PromotionCalculator(customer, totalMenu);
         int totalPriceBeforeDiscount = promotionCalculator.calcTotalPriceBeforeDiscount();
+        List<Integer> promotionPrices = promotionCalculator.calcPromotion(date);
         outputView.printMenu(promotionCalculator.getOrderMenu());
         outputView.printTotalPriceBeforeDiscount(totalPriceBeforeDiscount);
         outputView.printFreeMenu(totalPriceBeforeDiscount);
-        outputView.printPromotion(promotionCalculator.calcPromotion(date));
+        outputView.printPromotion(promotionPrices, promotionCalculator.isWeekDay(date));
+        outputView.printTotalPriceAfterDiscount(totalPriceBeforeDiscount,promotionPrices);
+        outputView.printBadge(promotionPrices);
     }
 }
 
