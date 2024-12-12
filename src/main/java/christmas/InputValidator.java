@@ -18,6 +18,7 @@ public class InputValidator {
     public static final String MENU_NUMBER_SEPARATOR = "-";
     private final OutputView outputView;
     private final TotalMenu totalMenu;
+    private String input;
 
     public InputValidator(OutputView outputView) {
         this.outputView = outputView;
@@ -54,20 +55,22 @@ public class InputValidator {
     }
 
     private void isValidInputForm(String input){
-        if(!input.matches("[가-힣]+-\\d+(,\\s[가-힣]+-\\d+)*")){
+        String trimmedInput = input.replace(" ","");
+        if(!trimmedInput.matches("[가-힣]+-\\d(,[가-힣]+-\\d+)*")){
             throw new IllegalArgumentException(ErrorMessage.INPUT_MENU_ERROR.getContent());
         }
+        this.input = trimmedInput;
     }
 
     private void isInMenu(String inputMenu){
-        String menuName = inputMenu.split(MENU_NUMBER_SEPARATOR)[0].trim();
+        String menuName = input.split(MENU_NUMBER_SEPARATOR)[0];
         if(!totalMenu.hasMenu(menuName)){
             throw new IllegalArgumentException(ErrorMessage.INPUT_MENU_ERROR.getContent());
         }
     }
 
     private void isDuplicateMenu(String inputMenu){
-        List<String> menus = Arrays.stream(inputMenu.split(MENU_SEPARATOR)).toList();
+        List<String> menus = Arrays.stream(input.split(MENU_SEPARATOR)).toList();
         for(String menu : menus){
             if(menus.indexOf(menu) != menus.lastIndexOf(menu)){
                 throw new IllegalArgumentException(ErrorMessage.INPUT_MENU_ERROR.getContent());
@@ -76,7 +79,7 @@ public class InputValidator {
     }
 
     private void isValidNumberOfFood(String inputMenu){
-        List<String> menus = Arrays.stream(inputMenu.split(MENU_SEPARATOR)).toList();
+        List<String> menus = Arrays.stream(input.split(MENU_SEPARATOR)).toList();
         int totalNumber = 0;
         for(String menu : menus){
             int menuNumber = Integer.parseInt(Arrays.stream(menu.split(MENU_NUMBER_SEPARATOR)).toList().get(1));
