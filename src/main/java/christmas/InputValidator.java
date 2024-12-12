@@ -27,13 +27,13 @@ public class InputValidator {
 
     public boolean dateValidate(String inputDate) {
         int date;
-        try{
+        try {
             date = Integer.parseInt(inputDate);
-        }catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             outputView.printInputDateError();
             return false;
         }
-        if(date < MINIMUM_DATE || date > MAXIMUM_DATE){
+        if (date < MINIMUM_DATE || date > MAXIMUM_DATE) {
             outputView.printInputDateError();
             return false;
         }
@@ -41,65 +41,65 @@ public class InputValidator {
     }
 
     public boolean menuValidate(String inputMenu) {
-        try{
+        try {
             isValidInputForm(inputMenu);
             isInMenu(inputMenu);
             isDuplicateMenu(inputMenu);
             isValidNumberOfFood(inputMenu);
             isValidMenuType(inputMenu);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             outputView.printInputMenuError();
             return false;
         }
         return true;
     }
 
-    private void isValidInputForm(String input){
-        String trimmedInput = input.replace(" ","");
-        if(!trimmedInput.matches("[가-힣]+-\\d(,[가-힣]+-\\d+)*")){
+    private void isValidInputForm(String input) {
+        String trimmedInput = input.replace(" ", "");
+        if (!trimmedInput.matches("[가-힣]+-\\d(,[가-힣]+-\\d+)*")) {
             throw new IllegalArgumentException(ErrorMessage.INPUT_MENU_ERROR.getContent());
         }
         this.input = trimmedInput;
     }
 
-    private void isInMenu(String inputMenu){
+    private void isInMenu(String inputMenu) {
         String menuName = input.split(MENU_NUMBER_SEPARATOR)[0];
-        if(!totalMenu.hasMenu(menuName)){
+        if (!totalMenu.hasMenu(menuName)) {
             throw new IllegalArgumentException(ErrorMessage.INPUT_MENU_ERROR.getContent());
         }
     }
 
-    private void isDuplicateMenu(String inputMenu){
+    private void isDuplicateMenu(String inputMenu) {
         List<String> menus = Arrays.stream(input.split(MENU_SEPARATOR)).toList();
-        for(String menu : menus){
-            if(menus.indexOf(menu) != menus.lastIndexOf(menu)){
+        for (String menu : menus) {
+            if (menus.indexOf(menu) != menus.lastIndexOf(menu)) {
                 throw new IllegalArgumentException(ErrorMessage.INPUT_MENU_ERROR.getContent());
             }
         }
     }
 
-    private void isValidNumberOfFood(String inputMenu){
+    private void isValidNumberOfFood(String inputMenu) {
         List<String> menus = Arrays.stream(input.split(MENU_SEPARATOR)).toList();
         int totalNumber = 0;
-        for(String menu : menus){
+        for (String menu : menus) {
             int menuNumber = Integer.parseInt(Arrays.stream(menu.split(MENU_NUMBER_SEPARATOR)).toList().get(1));
             totalNumber += menuNumber;
         }
-        if(totalNumber > 20){
+        if (totalNumber > 20) {
             throw new IllegalArgumentException(ErrorMessage.INPUT_MENU_ERROR.getContent());
         }
     }
 
-    private void isValidMenuType(String inputMenu){
+    private void isValidMenuType(String inputMenu) {
         Set<Optional<String>> menuTypes = new HashSet<>();
 
         List<String> menus = Arrays.stream(inputMenu.split(MENU_SEPARATOR)).toList();
 
-        for(String menu : menus){
+        for (String menu : menus) {
             menuTypes.add(totalMenu.getMenuType(menu.split(MENU_NUMBER_SEPARATOR)[0].trim()));
         }
         ArrayList<Optional<String>> menuType = new ArrayList<>(menuTypes);
-        if(menuType.size() == 1 && menuType.get(0).get().equals("Menu.DrinkMenu")){
+        if (menuType.size() == 1 && menuType.get(0).get().equals("Menu.DrinkMenu")) {
             throw new IllegalArgumentException(ErrorMessage.INPUT_MENU_ERROR.getContent());
         }
     }

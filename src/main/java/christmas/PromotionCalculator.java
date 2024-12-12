@@ -44,15 +44,11 @@ public class PromotionCalculator {
 
     public List<Integer> calcPromotion(int date) {
         List<Integer> promotionPrices = new LinkedList<>();
-        //크리스마스 디데이 할인
         promotionPrices.add(calcDDayPromotion(date));
-        //평일 & 주말 할인
         List<Integer> weekDayPromotion = calcWeekDayPromotion(date);
         promotionPrices.add(weekDayPromotion.get(0));
         promotionPrices.add(weekDayPromotion.get(1));
-        //특별할인
         promotionPrices.add(calcSpecialPromotion(date));
-        //증정 이벤트
         promotionPrices.add(calcFreePromotion());
         return promotionPrices;
     }
@@ -65,13 +61,13 @@ public class PromotionCalculator {
     }
 
     private List<Integer> calcWeekDayPromotion(int date) {
-        if (!isWeekDay(date)) {
+        if (!isWeekend(date)) {
             return List.of(getNumbersOfSpecificType("Menu.DessertMenu") * WEEK_DAY_PROMOTION_UNIT, INIT_PRICE);
         }
         return List.of(INIT_PRICE, getNumbersOfSpecificType("Menu.MainMenu") * WEEK_DAY_PROMOTION_UNIT);
     }
 
-    public boolean isWeekDay(int date) {
+    public boolean isWeekend(int date) {
         return (date % DAYS_OF_WEEK) <= WEEKEND_REMAIN_VALUE;
     }
 
@@ -80,19 +76,19 @@ public class PromotionCalculator {
     }
 
     private int calcSpecialPromotion(int date) {
-        if(isSpecialDay(date)){
+        if (isSpecialDay(date)) {
             return SPECIAL_DATE_PROMOTION_UNIT;
         }
         return INIT_PRICE;
     }
 
-    private boolean isSpecialDay(int date){
+    private boolean isSpecialDay(int date) {
         return date % DAYS_OF_WEEK == REAMAIN_NUMBER_OF_SUNDAY || date == CHRISTMAS_DATE;
     }
 
     private Integer calcFreePromotion() {
         int totalPriceBeforeDiscount = calcTotalPriceBeforeDiscount();
-        if(totalPriceBeforeDiscount > OutputView.FREE_PRODUCT_THRESHOLD){
+        if (totalPriceBeforeDiscount > OutputView.FREE_PRODUCT_THRESHOLD) {
             return FREE_PRODUCT_PRICE;
         }
         return INIT_PRICE;

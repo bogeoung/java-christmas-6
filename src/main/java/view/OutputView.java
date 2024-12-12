@@ -85,16 +85,17 @@ public class OutputView {
 
     public void printTotalPriceAfterDiscount(int totalPriceBeforeDiscount, List<Integer> promotionPrices) {
         System.out.printf("%s<할인 후 예상 결제 금액>%s", System.lineSeparator(), System.lineSeparator());
-        String formattedTotalPriceAfterDiscount = "";
+        String TotalPriceAfterDiscount = "";
+        int promotionDiscountPrice = getSumOfPromotionsPrices(promotionPrices);
         if (totalPriceBeforeDiscount >= FREE_PRODUCT_THRESHOLD) {
-            formattedTotalPriceAfterDiscount = decimalFormat.format(
-                    totalPriceBeforeDiscount + PromotionCalculator.FREE_PRODUCT_PRICE - getSumOfPromotionsPrices(promotionPrices));
+            TotalPriceAfterDiscount = decimalFormat.format(
+                    totalPriceBeforeDiscount + PromotionCalculator.FREE_PRODUCT_PRICE - promotionDiscountPrice);
         }
         if (totalPriceBeforeDiscount < FREE_PRODUCT_THRESHOLD) {
-            formattedTotalPriceAfterDiscount =
-                    decimalFormat.format(totalPriceBeforeDiscount - getSumOfPromotionsPrices(promotionPrices));
+            TotalPriceAfterDiscount =
+                    decimalFormat.format(totalPriceBeforeDiscount - promotionDiscountPrice);
         }
-        System.out.println(formattedTotalPriceAfterDiscount);
+        System.out.println(TotalPriceAfterDiscount);
     }
 
     public void printBadge(List<Integer> promotionPrices) {
