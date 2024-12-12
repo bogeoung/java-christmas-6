@@ -97,7 +97,6 @@ public class InputValidator {
         }
         ArrayList<Optional<String>> menuType = new ArrayList<>(menuTypes);
         if(menuType.size() == 1 && menuType.get(0).get().equals("Menu.DrinkMenu")){
-
             throw new IllegalArgumentException(ErrorMessage.INPUT_MENU_ERROR.getContent());
         }
     }
