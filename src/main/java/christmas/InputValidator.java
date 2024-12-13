@@ -55,6 +55,9 @@ public class InputValidator {
     }
 
     private void isValidInputForm(String input) {
+        if(input == null || input.isEmpty()){
+            throw new IllegalArgumentException(ErrorMessage.INPUT_MENU_ERROR.getContent());
+        }
         String trimmedInput = input.replace(" ", "");
         if (!trimmedInput.matches("[가-힣]+-\\d(,[가-힣]+-\\d+)*")) {
             throw new IllegalArgumentException(ErrorMessage.INPUT_MENU_ERROR.getContent());
@@ -71,10 +74,13 @@ public class InputValidator {
 
     private void isDuplicateMenu(String inputMenu) {
         List<String> menus = Arrays.stream(input.split(MENU_SEPARATOR)).toList();
-        for (String menu : menus) {
-            if (menus.indexOf(menu) != menus.lastIndexOf(menu)) {
-                throw new IllegalArgumentException(ErrorMessage.INPUT_MENU_ERROR.getContent());
-            }
+        Set<String> menuSet = new HashSet<>();
+
+        for(String menu : menus) {
+            menuSet.add(menu.split(MENU_NUMBER_SEPARATOR)[0]);
+        }
+        if(menuSet.size() != menus.size()) {
+            throw new IllegalArgumentException(ErrorMessage.INPUT_MENU_ERROR.getContent());
         }
     }
 
