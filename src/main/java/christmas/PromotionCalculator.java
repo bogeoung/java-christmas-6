@@ -18,7 +18,7 @@ public class PromotionCalculator {
     public static final int INIT_PRICE = 0;
     public static final int SPECIAL_DATE_PROMOTION_UNIT = 1000;
     public static final int CHRISTMAS_DATE = 25;
-    public static final int REAMAIN_NUMBER_OF_SUNDAY = 3;
+    public static final int REMAIN_NUMBER_OF_SUNDAY = 3;
     public static final int FREE_PRODUCT_PRICE = 25000;
     Customer customer;
     TotalMenu totalMenu;
@@ -26,10 +26,6 @@ public class PromotionCalculator {
     public PromotionCalculator(Customer customer, TotalMenu totalMenu) {
         this.customer = customer;
         this.totalMenu = totalMenu;
-    }
-
-    public Map<String, Integer> getOrderMenu() {
-        return customer.getOrderMenu();
     }
 
     public int calcTotalPriceBeforeDiscount() {
@@ -42,10 +38,15 @@ public class PromotionCalculator {
         return totalPriceBeforeDiscount;
     }
 
+    public boolean isWeekend(int date) {
+        int remainDaysAfterDay1 = date % DAYS_OF_WEEK;
+        return remainDaysAfterDay1 <= WEEKEND_REMAIN_VALUE && remainDaysAfterDay1 > 0;
+    }
+
     public List<Integer> calcPromotion(int date) {
         List<Integer> promotionPrices = new LinkedList<>();
-        promotionPrices.add(calcDDayPromotion(date));
         List<Integer> weekDayPromotion = calcWeekDayPromotion(date);
+        promotionPrices.add(calcDDayPromotion(date));
         promotionPrices.add(weekDayPromotion.get(0));
         promotionPrices.add(weekDayPromotion.get(1));
         promotionPrices.add(calcSpecialPromotion(date));
@@ -67,14 +68,6 @@ public class PromotionCalculator {
         return List.of(INIT_PRICE, getNumbersOfSpecificType("Menu.MainMenu") * WEEK_DAY_PROMOTION_UNIT);
     }
 
-    public boolean isWeekend(int date) {
-        return (date % DAYS_OF_WEEK) <= WEEKEND_REMAIN_VALUE;
-    }
-
-    private int getNumbersOfSpecificType(String type) {
-        return customer.getNumberOfSpecificType(totalMenu, type);
-    }
-
     private int calcSpecialPromotion(int date) {
         if (isSpecialDay(date)) {
             return SPECIAL_DATE_PROMOTION_UNIT;
@@ -83,7 +76,7 @@ public class PromotionCalculator {
     }
 
     private boolean isSpecialDay(int date) {
-        return date % DAYS_OF_WEEK == REAMAIN_NUMBER_OF_SUNDAY || date == CHRISTMAS_DATE;
+        return date % DAYS_OF_WEEK == REMAIN_NUMBER_OF_SUNDAY || date == CHRISTMAS_DATE;
     }
 
     private Integer calcFreePromotion() {
@@ -92,5 +85,13 @@ public class PromotionCalculator {
             return FREE_PRODUCT_PRICE;
         }
         return INIT_PRICE;
+    }
+
+    private int getNumbersOfSpecificType(String type) {
+        return customer.getNumberOfSpecificType(totalMenu, type);
+    }
+
+    public Map<String, Integer> getOrderMenu() {
+        return customer.getOrderMenu();
     }
 }
